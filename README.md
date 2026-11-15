@@ -22,6 +22,9 @@ RIDGE Monitor is a visual tool that helps an astronaut check their own health ea
 - **Escalation with communication delay.** "Prepare report for flight surgeon" builds a short text summary and shows the expected one-way delay for the selected environment.
 - **Trend charts.** Hand-made SVG charts for the last 14 or 30 days, with the personal baseline, an illustrative usual range, a crosshair tooltip, keyboard support and a table view.
 - **Environment selector.** Space station, spacecraft in transit, Moon base, Mars base and rover. The choice changes the communication delay and the gravity and radiation notes.
+- **Space weather scenario.** "Simulate space weather event" shows what a radiation alert looks like: the dosimeter spikes, the R tile turns to Act and an event card lists the steps. It is clearly marked "Simulation", nothing is saved, and "End event" puts everything back.
+- **Gravity transition check.** A four-question readiness checklist for the time after landing or any change of gravity: lightheadedness on standing, balance, hand-eye coordination and weakness. It gives a status and next steps, and it is highlighted for the Moon base, Mars base and rover.
+- **Works offline.** The app keeps its own files on the device and opens with no connection. The header shows a "works offline" indicator.
 - **Mission routine and badges.** Five daily tasks built from the check-in prompt the astronaut to take missing measurements. A check-in streak, points and four badges reward healthy habits such as exercise, drinking enough and journaling.
 
 ![Details panel for the Eyes region, opened from the body figure](screenshots/details.png)
@@ -29,6 +32,10 @@ RIDGE Monitor is a visual tool that helps an astronaut check their own health ea
 ![Trend chart of the dosimeter reading with one spike marked as Act and Watch days](screenshots/trend.png)
 
 ![Mission routine with today's tasks and four healthy-habit badges](screenshots/routine.png)
+
+![Space weather simulation: the R tile at Act and the event card with steps](screenshots/simulation.png)
+
+![Gravity transition check with two signs reported and the readiness result](screenshots/gravity-check.png)
 
 ## Why it matters
 
@@ -45,7 +52,11 @@ On long missions astronauts carry much of the responsibility for spotting change
 - **Online:** <https://helios84.github.io/ridge-monitor/>
 - **Offline:** download the repository and open `index.html` in a browser. There is no build step and no install.
 
-The app makes no network requests. It uses no external scripts, fonts, CDNs, cookies or trackers. Check-ins are stored only in your browser (`localStorage`). "Reset demo data" at the bottom of the page restores the synthetic data.
+The app never contacts any other server. It uses no external scripts, fonts, CDNs, cookies or trackers. Check-ins are stored only in your browser (`localStorage`).
+
+### Why it works offline
+
+On a Mars mission the one-way communication delay can reach 20 minutes ([S3](https://www.nasa.gov/hrp/hazard-distance-from-earth/)), and crews must handle medical situations with minimal help from Earth. A health tool for that setting cannot depend on a connection. RIDGE Monitor therefore runs entirely on the device: opened as a local file it needs no network at all, and opened from the web address a small service worker (`sw.js`) saves the app's own files (`index.html`, `styles.css`, `app.js`, `data.js`, `favicon.svg`, `manifest.json`) so that the next visit works with no connection. The service worker handles only these files. "Reset demo data" at the bottom of the page restores the synthetic data.
 
 ## How the app answers the challenge questions
 
@@ -57,7 +68,7 @@ The app makes no network requests. It uses no external scripts, fonts, CDNs, coo
 | When does a result warrant attention from the crew or flight surgeons? | Four statuses. Watch means self-care and check again. Act means contact the flight surgeon. The reason for each status is written next to it. The thresholds are illustrative prototype values kept in one object, `PROTOTYPE_ASSUMPTIONS`. |
 | What actions can prevent a critical health condition? | "What to do" steps on every Watch and Act item and a "What helps" section in each body panel, for example exercise against bone loss, fluids against kidney stone risk, and lighting that follows a day-night cycle for sleep. |
 
-Optional considerations covered: different environments, prompts to take measurements as part of a mission routine, gamification that encourages healthy tasks, dynamic charts, color coding, and simple instructions for people who are not medical experts.
+Optional considerations covered: different environments (including a gravity transition check for the Moon and Mars), prompts to take measurements as part of a mission routine, gamification that encourages healthy tasks, dynamic charts, color coding, and simple instructions for people who are not medical experts.
 
 ## NASA and partner resources used
 
@@ -85,7 +96,7 @@ How the resources shaped the project: the RIDGE acronym is the backbone of the i
 
 ## Tools and resources
 
-- Languages: HTML, CSS and JavaScript, with no frameworks, libraries or build tools.
+- Languages: HTML, CSS and JavaScript, with no frameworks, libraries or build tools. Offline support uses a web app manifest and a service worker.
 - Drawings: the body figure, the logo, the favicon, the charts and the vision grid are our own SVG.
 - Tools: Git, GitHub and GitHub Pages, Visual Studio Code, Node.js (local syntax checks only), Microsoft Edge (local testing and screenshots), Claude Code (see below).
 - No third-party code, images, icons or fonts are included.
@@ -109,6 +120,8 @@ AI assistance was used throughout this project, and we state it here as the chal
 - **Illustrative thresholds.** NASA and CSA pages used here give no numeric alert thresholds. Every threshold, the 7-day baseline rule, the 2-day rule for symptoms, and the routine times of day, points and badge rules are illustrative prototype values in `PROTOTYPE_ASSUMPTIONS` and are labeled as such in the interface. They are not medical thresholds.
 - **Not a medical device.** The app gives general wellness and escalation guidance only. It does not diagnose and names no medication.
 - **Radiation.** The sources give no dose unit or dose limit. The dosimeter field uses mSv/day as an illustrative unit for a user-entered value, compares it only with the user's own baseline, and shows no limits.
+- **Space weather simulation.** The simulated dosimeter reading is six times the personal baseline, an illustrative value. The first step tells the crew member to go to the shielded area named in their mission's radiation procedure. Our sources name shielding as part of NASA's strategy but do not describe a shelter procedure, so the app points to the mission's own procedure.
+- **Gravity transition check.** The four questions follow the effects NASA describes for gravity transitions. The scoring rule (one sign is Watch, two or more is Act) and the "How to check" steps are illustrative. It is not a clinical test.
 - **Communication delay.** Only the Mars figure (up to 20 minutes one way) is sourced. The values for the space station and the Moon are illustrative.
 - **Body temperature** is a general wellness indicator with no direct RIDGE source, and it is labeled that way.
 - **"How to measure" steps and the vision grid** are illustrative prototype instructions written for this app. They are not agency procedures or clinical tests.

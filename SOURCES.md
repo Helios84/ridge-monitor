@@ -86,6 +86,20 @@ S7 was read as background and is not cited in the interface: it gives Mars gravi
 | Badge "Journal Keeper" (journal notes) | I | S2, S11 |
 | Badge "Steady Logger" (check-in streak) | none | none (design choice) |
 
+### Space weather scenario, gravity transition check, offline mode
+
+| Feature | Hazard | Sources |
+|---|---|---|
+| Space weather simulation: what space weather is | R | S1 |
+| Space weather simulation: steps (shielding, measuring, reporting) | R | S1, S11 |
+| Gravity transition check: lightheadedness and fainting when moving into gravity, time to adjust after landing | G | S5 |
+| Gravity transition check: lightheaded when standing up | G | S6d |
+| Gravity transition check: balance and walking | G | S5, S11 |
+| Gravity transition check: hand-eye coordination | G | S5, S11 |
+| Gravity transition check: muscle weakness | G | S10a |
+| Gravity transition check: guidance | G | S5, S6, S6d |
+| Offline mode: why the app must work with no connection | D | S3 |
+
 ## What does not come from these sources
 
 These items are our own and are labeled in the interface:
@@ -94,6 +108,8 @@ These items are our own and are labeled in the interface:
 - The dosimeter unit, mSv/day: illustrative. The sources give no dose unit or limit, and the app shows no limits.
 - Communication delay for the space station and the Moon: illustrative.
 - Mission routine times of day, points and badge rules: illustrative.
+- Space weather simulation: the simulated reading (six times the baseline) is illustrative. The sources do not describe a shelter procedure, so the step refers to the mission's own radiation procedure.
+- Gravity transition check: the scoring rule and the "How to check" steps are illustrative.
 - "How to measure" steps and the vision grid: illustrative prototype instructions.
 - "What it does" lines for each body part: general anatomy.
 - Body temperature: a general wellness indicator with no direct RIDGE source.
