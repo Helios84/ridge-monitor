@@ -1,0 +1,13 @@
+{
+  "name": "RIDGE Monitor",
+  "short_name": "RIDGE Monitor",
+  "description": "Astronaut health self-check for life beyond Earth. Hackathon prototype with synthetic demo data. Not a medical device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0920",
+  "theme_color": "#0b0920",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

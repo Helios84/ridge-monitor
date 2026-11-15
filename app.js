@@ -318,7 +318,7 @@
     $('#mission-day').textContent = fmtDateLong(state.today);
     const delay = PA.commDelay[currentEnv().id];
     $('#stat-link').textContent = cap(delay.text.replace(' one way', ''));
-    $('#stat-link-note').textContent = delay.sourced ? 'one-way delay' : 'one-way delay · illustrative';
+    $('#stat-link-note').textContent = delay.sourced ? 'one-way' : 'one-way, illustrative';
     const sel = $('#env');
     if (!sel.options.length) {
       sel.innerHTML = D.ENVIRONMENTS.map(e => `<option value="${e.id}">${esc(e.label)}</option>`).join('');
@@ -1265,7 +1265,34 @@
     state.region = best;
   }
 
+  // Offline mode. Opened as a local file, the app needs no network at all.
+  // Served from a web address, a service worker (sw.js) keeps the app's own
+  // files on the device. Distance from Earth is why this matters [S3].
+  function setOffline(ready, text) {
+    const chip = $('#offline-chip');
+    chip.classList.toggle('ready', ready);
+    $('.offline-ic', chip).textContent = ready ? '✓' : '!';
+    $('#offline-text').textContent = text;
+  }
+
+  function initOffline() {
+    if (location.protocol === 'file:') { setOffline(true, 'works offline'); return; }
+    // The web app manifest only applies when the app is served from a web address.
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = 'manifest.json';
+    document.head.appendChild(link);
+    if (!('serviceWorker' in navigator)) { setOffline(false, 'needs a connection'); return; }
+    navigator.serviceWorker.register('sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => setOffline(true, navigator.onLine ? 'works offline' : 'offline now, running from device'))
+      .catch(() => setOffline(false, 'needs a connection'));
+    window.addEventListener('offline', () => { if ($('#offline-chip').classList.contains('ready')) setOffline(true, 'offline now, running from device'); });
+    window.addEventListener('online', () => { if ($('#offline-chip').classList.contains('ready')) setOffline(true, 'works offline'); });
+  }
+
   function init() {
+    initOffline();
     loadState();
     pickStartRegion();
     bindEvents();

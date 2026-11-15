@@ -125,16 +125,22 @@ textarea { width: 100%; resize: vertical; }
 }
 .jump { display: flex; gap: 4px; overflow-x: auto; }
 .jump a {
-  flex: none; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line);
-  text-decoration: none; font-size: .8rem; color: var(--text-2); background: var(--surface);
+  flex: none; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line);
+  text-decoration: none; font-size: .78rem; color: var(--text-2); background: var(--surface);
 }
 .jump a:hover { border-color: var(--accent); color: #fff; }
 .demo-banner {
-  padding: 3px 12px; border-radius: 999px; font-size: .8rem; color: var(--text-2);
+  padding: 3px 12px; border-radius: 999px; font-size: .78rem; color: var(--text-2);
   border: 1px solid color-mix(in srgb, var(--watch) 55%, var(--line)); background: transparent;
 }
+.offline-chip { display: inline-flex; align-items: center; gap: 4px; color: var(--text-2); }
+.offline-ic {
+  width: 13px; height: 13px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: .5rem; font-weight: 800; border: 1.5px solid var(--muted); color: var(--muted);
+}
+.offline-chip.ready .offline-ic { border-color: var(--ok); color: var(--ok); }
 .ribbon-right { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-.sim-btn { min-height: 28px; padding: 2px 12px; font-size: .8rem; border-radius: 999px; }
+.btn.sim-btn { min-height: 26px; padding: 2px 12px; font-size: .8rem; border-radius: 999px; }
 .sim-on .sim-btn { background: var(--act); border-color: var(--act); color: var(--status-ink); font-weight: 700; }
 .sim-banner {
   max-width: 1408px; margin: 0 auto 6px; padding: 5px 12px; border-radius: 10px; font-size: .84rem;
