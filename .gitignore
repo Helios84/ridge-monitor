@@ -1,0 +1,13 @@
+AGENT_PROMPT.md
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
+*.pem
+*.key
+screenshots-private/
+private/

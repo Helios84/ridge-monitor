@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!-- Developed with AI assistance (see README → Use of AI) -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RIDGE Monitor</title>
+  <meta name="description" content="RIDGE Monitor — astronaut health self-check for life beyond Earth. Hackathon prototype with synthetic demo data. Not a medical device.">
+  <meta name="author" content="BAY ORBIT">
+  <meta name="ai-assistance" content="Code, text, synthetic data, logo and UI design in this project were developed with AI assistance. See README, section Use of AI.">
+  <meta name="theme-color" content="#0b0920">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="brand">
+      <!-- Logo: a pulse line that rises into a mountain ridge, above the arc of a planet -->
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <path d="M4 26 H12 L16.5 16 L21 30 L27 7 L32 26 H44" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 44 Q24 27 45 44" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" opacity=".5"/>
+        <circle cx="39" cy="11" r="2.4" fill="currentColor"/>
+      </svg>
+      <div>
+        <h1><span class="wm-strong">RIDGE</span> <span class="wm-light">Monitor</span></h1>
+        <p class="tagline">Astronaut health self-check for life beyond Earth</p>
+      </div>
+    </div>
+
+    <div class="stats" role="group" aria-label="Mission status">
+      <div class="stat">
+        <span class="stat-k">Mission day</span>
+        <span class="stat-v" id="stat-day"></span>
+        <span class="stat-s" id="mission-day"></span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">Earth link</span>
+        <span class="stat-v"><span class="signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="stat-link"></span></span>
+        <span class="stat-s" id="stat-link-note"></span>
+      </div>
+      <div class="stat">
+        <span class="stat-k">Next routine task</span>
+        <span class="stat-v" id="stat-next"></span>
+        <span class="stat-s" id="stat-next-sub"></span>
+      </div>
+    </div>
+
+    <div class="crew">
+      <div class="crew-id">
+        <span class="stat-k">Crew member</span>
+        <span id="crew-name" class="crew-name"></span>
+      </div>
+      <label class="env-label" for="env"><span class="stat-k">Environment</span>
+        <select id="env"></select>
+      </label>
+    </div>
+  </header>
+
+  <div class="ribbon">
+    <nav class="jump" aria-label="Sections">
+      <a href="#ridge-sec">Dashboard</a>
+      <a href="#guidance-sec">Guidance</a>
+      <a href="#routine-sec">Routine</a>
+      <a href="#trends-sec">Trends</a>
+      <a href="#checkin-sec">Check-in</a>
+    </nav>
+    <div class="demo-banner" role="note">
+      <strong>Synthetic demo data — not real astronaut data.</strong>
+      Prototype, not a medical device and not medical advice.
+    </div>
+  </div>
+  <div id="storage-warning" class="demo-banner warn" role="status" hidden>
+    Browser storage is not available. Your check-ins will be lost when you close this page.
+  </div>
+
+  <main id="main">
+
+    <!-- RIDGE overview strip -->
+    <section id="ridge-sec" aria-labelledby="h-ridge">
+      <div class="sec-head inline">
+        <h2 id="h-ridge">RIDGE hazards today</h2>
+        <p class="muted">NASA sums up the five hazards of human spaceflight as RIDGE. Select a tile to learn more.</p>
+      </div>
+      <div id="ridge-strip" class="ridge-strip"></div>
+      <div id="hazard-panel" class="card hazard-panel" hidden></div>
+    </section>
+
+    <!-- Bento: needs attention · body figure · indicators -->
+    <section id="body-sec" class="bento" aria-label="Dashboard">
+      <div class="card attention-card">
+        <div class="card-head">
+          <h2 id="h-attention">Needs attention</h2>
+          <span id="attention-count" class="count"></span>
+        </div>
+        <div id="attention" class="attention"></div>
+      </div>
+
+      <div class="card figure-card">
+        <div class="card-head">
+          <h2 id="h-body">Body check</h2>
+          <span class="muted small">Select a region</span>
+        </div>
+        <div class="figure-wrap">
+          <svg id="body-figure" class="body-figure" viewBox="0 0 200 470" role="group" aria-label="Human body figure with selectable regions">
+            <!-- Whole-body radiation: the silhouette itself (our own drawing) -->
+            <g class="region region-body" data-region="radiation" tabindex="0" role="button">
+              <title>Whole-Body Radiation</title>
+              <g class="silhouette">
+                <path d="M100 52 L107 52 C107 62 109 68 117 72 C131 76 142 80 146 92 C150 104 151 120 152 136 C153 150 156 162 159 178 C162 194 165 208 167 220 C169 229 168 239 164 243 C160 246 157 241 157 233 C156 218 152 202 148 186 C145 172 143 158 141 144 C140 134 139 126 137 118 C136 134 134 150 133 164 C132 176 134 190 137 204 C141 222 142 244 141 266 C140 288 137 306 135 322 C134 340 136 360 135 382 C134 402 131 420 130 436 C130 444 136 450 139 456 L118 458 C116 446 117 436 116 424 C114 400 112 380 112 360 C112 344 113 330 111 318 C108 290 106 262 104 236 C103 226 101 220 100 218"/>
+                <path d="M100 52 L107 52 C107 62 109 68 117 72 C131 76 142 80 146 92 C150 104 151 120 152 136 C153 150 156 162 159 178 C162 194 165 208 167 220 C169 229 168 239 164 243 C160 246 157 241 157 233 C156 218 152 202 148 186 C145 172 143 158 141 144 C140 134 139 126 137 118 C136 134 134 150 133 164 C132 176 134 190 137 204 C141 222 142 244 141 266 C140 288 137 306 135 322 C134 340 136 360 135 382 C134 402 131 420 130 436 C130 444 136 450 139 456 L118 458 C116 446 117 436 116 424 C114 400 112 380 112 360 C112 344 113 330 111 318 C108 290 106 262 104 236 C103 226 101 220 100 218" transform="matrix(-1 0 0 1 200 0)"/>
+                <ellipse cx="100" cy="32" rx="19" ry="23"/>
+              </g>
+            </g>
+            <!-- Muscles: upper arms, thighs, calves -->
+            <g class="region" data-region="muscles" tabindex="0" role="button">
+              <title>Muscles</title>
+              <ellipse class="shape" cx="146" cy="126" rx="5.5" ry="19" transform="rotate(-3 146 126)"/>
+              <ellipse class="shape" cx="54" cy="126" rx="5.5" ry="19" transform="rotate(3 54 126)"/>
+              <ellipse class="shape" cx="123" cy="262" rx="10" ry="36" transform="rotate(-3 123 262)"/>
+              <ellipse class="shape" cx="77" cy="262" rx="10" ry="36" transform="rotate(3 77 262)"/>
+              <ellipse class="shape" cx="124" cy="372" rx="7.5" ry="25"/>
+              <ellipse class="shape" cx="76" cy="372" rx="7.5" ry="25"/>
+            </g>
+            <!-- Bones: spine, hips, legs -->
+            <g class="region" data-region="bones" tabindex="0" role="button">
+              <title>Bones (spine, hips, legs)</title>
+              <path class="hit-line" d="M100 60 L100 204 M118 216 L124 316 M82 216 L76 316 M124 328 L123 428 M76 328 L77 428"/>
+              <path class="shape-line spine" d="M100 60 L100 200"/>
+              <path class="shape" d="M84 206 Q100 196 116 206 L112 216 Q100 209 88 216 Z"/>
+              <path class="shape-line" d="M118 218 L124 316 M82 218 L76 316 M124 328 L123 428 M76 328 L77 428"/>
+            </g>
+            <!-- Kidneys -->
+            <g class="region" data-region="kidneys" tabindex="0" role="button">
+              <title>Kidneys</title>
+              <ellipse class="shape" cx="113" cy="152" rx="5" ry="8.5" transform="rotate(-10 113 152)"/>
+              <ellipse class="shape" cx="87" cy="152" rx="5" ry="8.5" transform="rotate(10 87 152)"/>
+            </g>
+            <!-- Heart -->
+            <g class="region" data-region="heart" tabindex="0" role="button">
+              <title>Heart and Circulation</title>
+              <circle class="hit" cx="108" cy="106" r="12"/>
+              <path class="shape" d="M108 116 C95 107 100 96 108 102 C116 96 121 107 108 116 Z"/>
+            </g>
+            <!-- Immune system: lymph nodes at the neck and armpits -->
+            <g class="region" data-region="immune" tabindex="0" role="button">
+              <title>Immune System</title>
+              <circle class="hit" cx="111" cy="64" r="8"/>
+              <circle class="hit" cx="89" cy="64" r="8"/>
+              <circle class="hit" cx="131" cy="112" r="8"/>
+              <circle class="hit" cx="69" cy="112" r="8"/>
+              <circle class="shape" cx="111" cy="64" r="3.6"/>
+              <circle class="shape" cx="89" cy="64" r="3.6"/>
+              <circle class="shape" cx="131" cy="112" r="3.6"/>
+              <circle class="shape" cx="69" cy="112" r="3.6"/>
+            </g>
+            <!-- Brain -->
+            <g class="region" data-region="brain" tabindex="0" role="button">
+              <title>Brain and Behavior</title>
+              <path class="shape" d="M86 27 C86 15 114 15 114 27 C114 33 108 35 100 35 C92 35 86 33 86 27 Z"/>
+            </g>
+            <!-- Eyes: small dots -->
+            <g class="region" data-region="eyes" tabindex="0" role="button">
+              <title>Eyes</title>
+              <rect class="hit" x="84" y="36" width="32" height="12" rx="5"/>
+              <circle class="shape eye" cx="93" cy="42" r="2.3"/>
+              <circle class="shape eye" cx="107" cy="42" r="2.3"/>
+            </g>
+          </svg>
+          <ul id="region-list" class="region-list" aria-label="Body regions"></ul>
+        </div>
+      </div>
+
+      <div class="card ind-panel">
+        <div class="card-head">
+          <h2 id="h-indicators">Today's indicators</h2>
+          <span class="muted small">7-day mini charts · select for full trend</span>
+        </div>
+        <div id="indicators" class="ind-grid"></div>
+      </div>
+    </section>
+    <p class="muted legend-line" id="status-legend"></p>
+
+    <!-- Region details: slides in from the right -->
+    <div id="drawer-backdrop" class="backdrop" data-close-drawer hidden></div>
+    <aside id="region-drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Body region details" aria-hidden="true" tabindex="-1">
+      <div class="drawer-bar">
+        <span class="stat-k">Body region</span>
+        <button type="button" class="btn ghost" data-close-drawer>Close</button>
+      </div>
+      <article id="region-panel" class="region-panel" aria-live="polite"></article>
+    </aside>
+
+    <!-- Environment context -->
+    <section id="env-sec" aria-labelledby="h-env">
+      <div class="sec-head inline">
+        <h2 id="h-env">Environment</h2>
+        <p class="muted">What the selected environment means for communication, gravity and radiation.</p>
+      </div>
+      <div id="env-context" class="env-context"></div>
+    </section>
+
+    <!-- Guidance + escalation -->
+    <section id="guidance-sec" aria-labelledby="h-guidance">
+      <div class="sec-head inline">
+        <h2 id="h-guidance">Guidance for today</h2>
+        <p class="muted">Next steps for every item that needs attention. General wellness and escalation only.</p>
+      </div>
+      <div id="guidance" class="guidance"></div>
+      <div id="report-card" class="card report-card">
+        <h3>Escalate to the ground</h3>
+        <p id="delay-line"></p>
+        <button type="button" id="btn-report" class="btn primary">Prepare report for flight surgeon</button>
+        <div id="report-wrap" hidden>
+          <label for="report-text" class="sr-only">Report text</label>
+          <textarea id="report-text" rows="16" readonly></textarea>
+          <div class="row">
+            <button type="button" id="btn-copy" class="btn">Copy report</button>
+            <span id="copy-status" class="muted" role="status"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission routine + badges -->
+    <section id="routine-sec" aria-labelledby="h-routine">
+      <div class="sec-head inline">
+        <h2 id="h-routine">Mission routine</h2>
+        <p class="muted">Today's health tasks, and badges for keeping healthy habits. Times of day, points and badge rules are illustrative prototype values.</p>
+      </div>
+      <div class="routine-grid">
+        <div class="card">
+          <div class="panel-head"><h3>Today's tasks</h3><span id="routine-score" class="muted small"></span></div>
+          <ul id="routine-list" class="routine-list"></ul>
+        </div>
+        <div class="card">
+          <div class="panel-head"><h3>Healthy habits</h3><span id="streak" class="streak"></span></div>
+          <ul id="badges" class="badges"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trends -->
+    <section id="trends-sec" aria-labelledby="h-trends">
+      <div class="sec-head inline">
+        <h2 id="h-trends">Trends</h2>
+        <p class="muted">Grey means no data — it never counts as fine.</p>
+      </div>
+      <div class="card">
+        <div class="row chart-controls">
+          <label for="chart-ind">Indicator
+            <select id="chart-ind"></select>
+          </label>
+          <div class="seg" role="group" aria-label="Time range">
+            <button type="button" class="seg-btn" data-range="14">14 days</button>
+            <button type="button" class="seg-btn" data-range="30">30 days</button>
+          </div>
+        </div>
+        <h3 id="chart-title" class="chart-title"></h3>
+        <p id="chart-sub" class="muted small"></p>
+        <div id="chart-wrap" class="chart-wrap">
+          <div id="chart"></div>
+          <div id="chart-tip" class="chart-tip" hidden></div>
+        </div>
+        <p id="chart-note" class="muted small"></p>
+        <details class="table-view">
+          <summary>Table view</summary>
+          <div id="chart-table" class="table-scroll"></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Daily check-in -->
+    <section id="checkin-sec" aria-labelledby="h-checkin">
+      <div class="sec-head inline">
+        <h2 id="h-checkin">Daily check-in</h2>
+        <p class="muted">Enter what you measured today. Leave a field empty if you did not measure it. Open “How to measure” for simple steps.</p>
+      </div>
+      <form id="checkin" class="card checkin"></form>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><strong>Prototype, not a medical device and not medical advice.</strong> All thresholds are illustrative prototype values.</p>
+    <p><strong>Synthetic demo data — not real astronaut data.</strong> The crew member is fictional.</p>
+    <p><strong>Not affiliated with or endorsed by NASA</strong> or the Canadian Space Agency. Health facts link to their public pages.</p>
+    <p><strong>Use of AI:</strong> code, text and synthetic data were developed with AI assistance. Logo and UI design created with AI assistance. See the README.</p>
+    <p>Team BAY ORBIT · Tampa, FL · NASA Space Apps Challenge 2026</p>
+    <p><button type="button" id="btn-reset" class="btn">Reset demo data</button></p>
+  </footer>
+
+  <div id="live" class="sr-only" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
