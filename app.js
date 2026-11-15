@@ -29,6 +29,7 @@
     hazard: null,           // open RIDGE tile, or null
     drawer: false,          // region details drawer open?
     attAll: false,          // "Needs attention" expanded to show every item?
+    sim: false,             // space weather simulation running? (never saved)
     indicator: 'sleepHours',
     range: 30,
     storageOk: true
@@ -151,7 +152,17 @@
   let cache = {};
   function invalidate() { cache = {}; }
 
+  // The simulated dosimeter reading for today, or null when no simulation runs.
+  function simDose() {
+    if (!state.sim) return null;
+    state.sim = false;                 // read the real baseline, not the simulated value
+    const b = baseline('dosimeter');
+    state.sim = true;
+    return Math.round((b === null ? 1 : b) * PA.simulation.dosimeterFactor * 100) / 100;
+  }
+
   function val(date, id) {
+    if (state.sim && id === 'dosimeter' && date === state.today) return simDose();
     const e = state.entries[date];
     if (!e) return null;
     const v = e[id];
@@ -548,12 +559,13 @@
     let L = [
       'RIDGE MONITOR — CREW HEALTH SELF-CHECK REPORT',
       '*** SYNTHETIC DEMO DATA — NOT REAL ASTRONAUT DATA ***',
+    ].concat(state.sim ? ['*** SIMULATION: space weather event — the dosimeter reading is simulated ***'] : [], [
       '',
       `Crew member: ${D.CREW.id} (${D.CREW.note})`,
       `Date: ${state.today} · Mission day ${missionDay()}`,
       `Environment: ${env.label}`,
       `Expected one-way comm delay: ${delay.text}` + (delay.sourced ? ' [S3]' : ' (illustrative prototype value)')
-    ];
+    ]);
     if (delay.oneWayMin) L.push(`Earliest possible reply: about ${delay.oneWayMin * 2} min after sending (round trip).`);
     L.push('');
     L = L.concat(group('ACT', 'act'), group('WATCH', 'watch'), group('NO DATA', 'nodata'), group('USUAL', 'ok'));
@@ -649,8 +661,21 @@
     count.className = 'count' + (acts ? ' hot' : '');
     count.setAttribute('aria-label', hot.length + ' items need attention');
     let html = '';
+    if (state.sim) {
+      const ev = evaluate('dosimeter', state.today);
+      const texts = ['Space weather means solar particle events and coronal mass ejections. They can harm the body and the spacecraft [S1].'].concat(D.INDICATORS.dosimeter.guidance.act);
+      html += `<div class="sim-card st-act">
+        <div class="att-top">${pill('act')}<span class="att-name">Space weather event</span><span class="sim-tag">Simulation</span></div>
+        <p class="att-do">${cite(texts[0])}</p>
+        <p class="att-do"><b>Simulated dosimeter reading:</b> ${esc(withUnit('dosimeter', ev.value))}. ${esc(ev.reason)}</p>
+        <ol class="steps">${texts.slice(1).map(s => `<li>${cite(s)}</li>`).join('')}</ol>
+        <div class="row wrap"><button type="button" class="btn ghost" data-sim-end>End event</button>
+          <button type="button" class="btn ghost" data-region="radiation">Details</button></div>
+        ${sourcesBlock(sourceIds(texts))}
+      </div>`;
+    }
     if (hot.length) {
-      const limit = 3;
+      const limit = state.sim ? 1 : 3;
       const shown = state.attAll ? hot : hot.slice(0, limit);
       html += `<ul class="att-list${state.attAll ? ' all' : ''}">` + shown.map(x => {
         const ind = D.INDICATORS[x.id];
@@ -1062,6 +1087,19 @@
     $('#report-wrap').hidden = true;
   }
 
+  // Space weather simulation: shows a dosimeter spike for today without saving it.
+  function setSim(on) {
+    state.sim = on;
+    invalidate();
+    document.body.classList.toggle('sim-on', on);
+    $('#sim-banner').hidden = !on;
+    const btn = $('#btn-sim');
+    btn.textContent = on ? 'End event' : 'Simulate space weather event';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    renderAll();
+    announce(on ? 'Simulation started: space weather event.' : 'Simulation ended.');
+  }
+
   function setDrawer(open) {
     state.drawer = open;
     const drawer = $('#region-drawer');
@@ -1101,6 +1139,8 @@
         return;
       }
       if (t.closest('[data-close-drawer]')) { setDrawer(false); return; }
+      if (t.closest('#btn-sim')) { setSim(!state.sim); return; }
+      if (t.closest('[data-sim-end]')) { setSim(false); return; }
       if (t.closest('[data-att-toggle]')) { state.attAll = !state.attAll; renderAttention(); return; }
       if (t.closest('[data-close-hazard]')) {
         state.hazard = null;
@@ -1198,6 +1238,11 @@
     $('#btn-reset').addEventListener('click', () => {
       if (!window.confirm('Reset all check-ins to the synthetic demo data?')) return;
       resetDemo();
+      state.sim = false;
+      document.body.classList.remove('sim-on');
+      $('#sim-banner').hidden = true;
+      $('#btn-sim').textContent = 'Simulate space weather event';
+      $('#btn-sim').setAttribute('aria-pressed', 'false');
       invalidate();
       state.hazard = null;
       setDrawer(false);

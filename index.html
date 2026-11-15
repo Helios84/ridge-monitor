@@ -66,10 +66,17 @@
       <a href="#trends-sec">Trends</a>
       <a href="#checkin-sec">Check-in</a>
     </nav>
-    <div class="demo-banner" role="note">
-      <strong>Synthetic demo data — not real astronaut data.</strong>
-      Prototype, not a medical device and not medical advice.
+    <div class="ribbon-right">
+      <div class="demo-banner" role="note">
+        <strong>Synthetic demo data — not real astronaut data.</strong>
+        Prototype, not a medical device and not medical advice.
+      </div>
+      <button type="button" id="btn-sim" class="btn sim-btn" aria-pressed="false">Simulate space weather event</button>
     </div>
+  </div>
+  <div id="sim-banner" class="sim-banner" role="status" hidden>
+    <strong>Simulation.</strong> Space weather event: today's dosimeter reading is simulated. Nothing is saved.
+    <button type="button" class="btn ghost" data-sim-end>End event</button>
   </div>
   <div id="storage-warning" class="demo-banner warn" role="status" hidden>
     Browser storage is not available. Your check-ins will be lost when you close this page.

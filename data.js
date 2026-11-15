@@ -74,6 +74,9 @@
       rover: { oneWayMin: 20, text: 'up to 20 min one way', sourced: true }
     },
     // The dosimeter unit is our choice: the sources give no dose unit or limit.
+    // "Simulate space weather event": today's dosimeter reading is shown as this
+    // many times the personal baseline. Illustrative, and never saved.
+    simulation: { dosimeterFactor: 6 },
     dosimeterUnit: 'mSv/day',
     cupMl: 240,
     // Mission routine points and badge rules (all illustrative).
@@ -283,7 +286,11 @@
       howNote: 'The unit (mSv/day) is an illustrative prototype value. This app shows no dose limits, because our sources give none.',
       guidance: {
         watch: ['Read the dosimeter again and note the time.', 'Check with mission control for space weather alerts.', 'Follow your mission\'s radiation procedures. NASA\'s strategy combines shielding, monitoring and operational procedures [S11].'],
-        act: ['Follow your mission\'s radiation procedures now [S11].', 'Report the reading and the time to mission control.', ACT_COMMON]
+        act: [
+          'Go to the most shielded area named in your mission\'s radiation procedure. Shielding is part of NASA\'s strategy against space radiation [S11].',
+          'Read your dosimeter again and write down the reading and the time. Radiation cannot be seen or felt, so it has to be measured [S1].',
+          ACT_COMMON
+        ]
       }
     }
   };
