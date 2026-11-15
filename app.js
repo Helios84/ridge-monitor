@@ -580,6 +580,10 @@
     }).filter(Boolean);
     if (avgs.length) L = L.concat(['7-DAY AVERAGE vs PERSONAL BASELINE'], avgs, ['']);
 
+    const land = landingState();
+    L = L.concat(['GRAVITY TRANSITION CHECK', `  ${STATUS[land.status].label} — ${land.reason}` +
+      (land.yes.length ? ' Reported: ' + land.yes.map(it => it.q.replace(/\?$/, '')).join('; ') + '.' : ''), '']);
+
     const note = (state.entries[state.today] || {}).note;
     if (note) L = L.concat(['JOURNAL NOTE (today)', '  ' + note, '']);
     L.push('All thresholds are illustrative prototype values.');
@@ -655,9 +659,11 @@
     const all = D.INDICATOR_ORDER.map(id => ({ id: id, ev: evaluate(id, state.today) }));
     const hot = all.filter(x => x.ev.status === 'act').concat(all.filter(x => x.ev.status === 'watch'));
     const none = all.filter(x => x.ev.status === 'nodata');
-    const acts = hot.filter(x => x.ev.status === 'act').length;
+    const land = landingState();
+    const landHot = land.status === 'act' || land.status === 'watch';
+    const acts = hot.filter(x => x.ev.status === 'act').length + (land.status === 'act' ? 1 : 0);
     const count = $('#attention-count');
-    count.textContent = hot.length;
+    count.textContent = hot.length + (landHot ? 1 : 0);
     count.className = 'count' + (acts ? ' hot' : '');
     count.setAttribute('aria-label', hot.length + ' items need attention');
     let html = '';
@@ -692,6 +698,13 @@
       }
     } else {
       html += `<p class="att-none">${pill('ok')} Nothing needs attention in the recorded indicators.</p>`;
+    }
+    if (landHot) {
+      html += `<div class="att-item st-${land.status}">
+        <div class="att-top">${pill(land.status)}<span class="att-name">Gravity transition check</span>
+          <a class="att-go" href="#landing-sec" aria-label="Open the gravity transition check"><span aria-hidden="true">›</span></a></div>
+        <p class="att-do"><b>Do now:</b> ${cite(D.LANDING.guidance[land.status][0])}</p>
+      </div>`;
     }
     html += `<div class="att-foot">`;
     if (none.length) {
@@ -778,6 +791,79 @@
         </span>
       </li>`;
     }).join('');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Gravity transition check (landing readiness)
+  // ---------------------------------------------------------------------------
+  function landingAnswers() {
+    return (state.entries[state.today] || {}).landing || {};
+  }
+
+  // Unanswered questions never count as fine: with no "Yes" and any gap, it is No data.
+  function landingState() {
+    const ans = landingAnswers();
+    const items = D.LANDING.items;
+    const yes = items.filter(it => ans[it.id] === true);
+    const open = items.filter(it => ans[it.id] !== true && ans[it.id] !== false);
+    let status = 'ok';
+    if (yes.length >= PA.landing.act) status = 'act';
+    else if (yes.length >= PA.landing.watch) status = 'watch';
+    else if (open.length) status = 'nodata';
+    const reason = status === 'nodata' ? (open.length === items.length ? 'Not checked today.' : `${open.length} of ${items.length} questions not answered.`)
+      : `${yes.length} of ${items.length} signs reported` + (open.length ? `, ${open.length} not answered.` : '.');
+    return { status: status, yes: yes, open: open, reason: reason };
+  }
+
+  function renderLandingForm() {
+    const ans = landingAnswers();
+    const surface = D.LANDING.surface.indexOf(state.env) !== -1;
+    $('#landing-form').innerHTML = `
+      <p class="why">${cite(D.LANDING.intro)}</p>
+      <p class="landing-env ${surface ? 'on' : ''}">${surface
+        ? `<strong>${esc(currentEnv().label)}:</strong> you are living in gravity after a weightless flight. Do this check before mission-critical tasks.`
+        : `<strong>${esc(currentEnv().label)}:</strong> use this check after landing or any change of gravity.`}</p>
+      <ul class="landing-list">` + D.LANDING.items.map(it => {
+        const v = ans[it.id];
+        return `<li class="landing-item">
+          <label for="l-${it.id}">${esc(it.q)} <span class="chips">${hazChips(['G'])}</span></label>
+          <select id="l-${it.id}" data-landing="${it.id}" aria-describedby="l-${it.id}-why">
+            <option value="">Not checked</option>
+            <option value="no"${v === false ? ' selected' : ''}>No</option>
+            <option value="yes"${v === true ? ' selected' : ''}>Yes</option>
+          </select>
+          <p class="why" id="l-${it.id}-why">${cite(it.why)}</p>
+          <p class="muted small"><b>How to check:</b> ${esc(it.how)}</p>
+        </li>`;
+      }).join('') + `</ul>
+      <p class="muted small">Illustrative prototype instructions. Follow your mission's medical procedures.</p>`;
+  }
+
+  function renderLandingResult() {
+    const st = landingState();
+    const steps = st.status === 'nodata' ? ['Answer all four questions to get a result.'] : D.LANDING.guidance[st.status];
+    const texts = [D.LANDING.intro].concat(D.LANDING.items.map(it => it.why), steps);
+    $('#landing-result').className = 'card landing-result st-' + st.status;
+    $('#landing-result').innerHTML = `
+      <div class="panel-head"><h3>Readiness today</h3>${pill(st.status)}</div>
+      <p class="reason">${esc(st.reason)}${st.yes.length ? ' Reported: ' + st.yes.map(it => esc(it.q.replace(/\?$/, ''))).join('; ') + '.' : ''}</p>
+      <p class="todo-h">What to do</p>
+      <ol class="steps">${steps.map(s => `<li>${cite(s)}</li>`).join('')}</ol>
+      <p class="muted small">Illustrative rule: ${PA.landing.watch} sign = Watch, ${PA.landing.act} or more = Act.</p>
+      ${sourcesBlock(sourceIds(texts))}`;
+  }
+
+  function saveLanding(id, raw) {
+    const e = Object.assign({}, state.entries[state.today] || {});
+    const ans = Object.assign({}, e.landing || {});
+    ans[id] = raw === '' ? null : raw === 'yes';
+    e.landing = ans;
+    state.entries[state.today] = e;
+    persist();
+    renderLandingResult();
+    renderAttention();
+    $('#report-wrap').hidden = true;
+    announce('Gravity transition check: ' + STATUS[landingState().status].label);
   }
 
   // ---------------------------------------------------------------------------
@@ -1084,6 +1170,8 @@
     renderRoutine();
     renderIndicators();
     renderChart();
+    renderLandingForm();
+    renderLandingResult();
     $('#report-wrap').hidden = true;
   }
 
@@ -1173,6 +1261,7 @@
       renderEnvContext();
       renderGuidance();
       renderAttention();
+      renderLandingForm();
       $('#report-wrap').hidden = true;
       announce('Environment set to ' + currentEnv().label);
     });
@@ -1205,6 +1294,11 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(renderChart, 150);
+    });
+
+    $('#landing-form').addEventListener('change', ev => {
+      const sel = ev.target.closest('[data-landing]');
+      if (sel) saveLanding(sel.dataset.landing, sel.value);
     });
 
     $('#checkin').addEventListener('submit', ev => {

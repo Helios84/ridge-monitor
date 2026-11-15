@@ -60,9 +60,9 @@
 
   <div class="ribbon">
     <nav class="jump" aria-label="Sections">
-      <a href="#ridge-sec">Dashboard</a>
       <a href="#guidance-sec">Guidance</a>
       <a href="#routine-sec">Routine</a>
+      <a href="#landing-sec">Gravity check</a>
       <a href="#trends-sec">Trends</a>
       <a href="#checkin-sec">Check-in</a>
     </nav>
@@ -245,6 +245,18 @@
           <div class="panel-head"><h3>Healthy habits</h3><span id="streak" class="streak"></span></div>
           <ul id="badges" class="badges"></ul>
         </div>
+      </div>
+    </section>
+
+    <!-- Gravity transition check (landing readiness) -->
+    <section id="landing-sec" aria-labelledby="h-landing">
+      <div class="sec-head inline">
+        <h2 id="h-landing">Gravity transition check</h2>
+        <p class="muted">A short readiness check after landing or any change of gravity. The scoring rule is an illustrative prototype value.</p>
+      </div>
+      <div class="landing-grid">
+        <div id="landing-form" class="card"></div>
+        <div id="landing-result" class="card" aria-live="polite"></div>
       </div>
     </section>
 

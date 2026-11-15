@@ -74,6 +74,8 @@
       rover: { oneWayMin: 20, text: 'up to 20 min one way', sourced: true }
     },
     // The dosimeter unit is our choice: the sources give no dose unit or limit.
+    // Gravity transition check: number of "Yes" answers for Watch and for Act.
+    landing: { watch: 1, act: 2 },
     // "Simulate space weather event": today's dosimeter reading is shown as this
     // many times the personal baseline. Illustrative, and never saved.
     simulation: { dosimeterFactor: 6 },
@@ -510,6 +512,43 @@
       why: 'Journaling is a safe outlet and helps track mental and emotional state [S2] [S11].' }
   ];
 
+  // ---------------------------------------------------------------------------
+  // LANDING — "Gravity transition check": a short readiness checklist for the
+  // time after landing or any change of gravity. The "how" steps are
+  // illustrative prototype instructions, not agency procedures.
+  // ---------------------------------------------------------------------------
+  var LANDING = {
+    intro: 'Moving from weightlessness into gravity can cause lightheadedness and fainting, and it affects balance, coordination and walking [S5]. Astronauts may need time to adjust after landing before they do mission-critical tasks [S5].',
+    surface: ['moon', 'mars', 'rover'],
+    items: [
+      { id: 'stand', q: 'Lightheaded or dizzy when you stand up?',
+        why: 'Low blood pressure raises the chance of fainting at landing [S6d].',
+        how: 'Stand up slowly from sitting, with a handhold. Wait one minute.' },
+      { id: 'balance', q: 'Unsteady when you stand or walk?',
+        why: 'Gravity transitions affect balance and walking [S5]. NASA tests balance after landing with functional tasks [S11].',
+        how: 'Stand with your feet together near a handhold for 30 seconds, then walk a few steps.' },
+      { id: 'coordination', q: 'Trouble with hand-eye coordination?',
+        why: 'Gravity transitions affect head-eye and hand-eye coordination [S5]. NASA also tests fine motor skills [S11].',
+        how: 'Touch a fixed point with a fingertip several times, then do a small task such as fastening a strap.' },
+      { id: 'weakness', q: 'Unusual muscle weakness?',
+        why: 'Muscles lose mass and strength in weightlessness [S10a].',
+        how: 'Compare with how you felt before the flight when you climb, lift or hold your posture.' }
+    ],
+    guidance: {
+      ok: ['No signs reported. Repeat the check after every change of gravity and before mission-critical tasks.'],
+      watch: [
+        'Take extra time to adjust before mission-critical tasks [S5].',
+        'Move slowly and keep a handhold when you stand up or turn.',
+        'Drink fluids. Plenty of fluids and lower-body compression garments before landing can help prevent low blood pressure [S6d].'
+      ],
+      act: [
+        'Put off hazardous tasks such as driving or piloting. Dizziness and coordination problems can make walking or driving hard [S6].',
+        'Sit or lie down if you feel faint. Lightheadedness and fainting can happen when moving into gravity [S5].',
+        ACT_COMMON
+      ]
+    }
+  };
+
   var CREW = { id: 'CM-2 · Nova', note: 'fictional crew member' };
 
   // ---------------------------------------------------------------------------
@@ -589,6 +628,7 @@
     REGION_ORDER: REGION_ORDER,
     ENVIRONMENTS: ENVIRONMENTS,
     ROUTINE: ROUTINE,
+    LANDING: LANDING,
     BADGES: BADGES,
     CREW: CREW,
     generateDemoData: generateDemoData,
